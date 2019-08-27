@@ -306,6 +306,9 @@ class NodeChunk(BaseObject):
         self.upgradeStatusTo(Status.STOPPED)
         self.node.nodeDesc.stopProcess(self)
 
+    def isExtern(self):
+        return self.status.execMode == ExecMode.EXTERN
+
     statusChanged = Signal()
     statusName = Property(str, statusName.fget, notify=statusChanged)
     execModeNameChanged = Signal()
@@ -557,7 +560,8 @@ class BaseNode(BaseObject):
             if the graph is still being computed.
         """
         for chunk in self.alreadySubmittedChunks():
-            chunk.upgradeStatusTo(Status.NONE, ExecMode.NONE)
+            if not chunk.isExtern():
+                chunk.upgradeStatusTo(Status.NONE, ExecMode.NONE)
 
     def upgradeStatusTo(self, newStatus):
         """
